@@ -10,6 +10,7 @@ import Payroll from './pages/Payroll';
 import Reports from './pages/Reports';
 import Schedule from './pages/Schedule';
 import Gallery from './pages/Gallery';
+import Blog from './pages/Blog';
 
 export default function App() {
   return (
@@ -22,6 +23,7 @@ export default function App() {
           <Route path="/employees" element={<Employees />} />
           <Route path="/services" element={<Services />} />
           <Route path="/gallery" element={<Gallery />} />
+          <Route path="/blog" element={<Blog />} />
           <Route path="/transactions" element={<Transactions />} />
           <Route path="/payroll" element={<Payroll />} />
           <Route path="/reports" element={<Reports />} />

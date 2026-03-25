@@ -7,6 +7,7 @@ const nav = [
   { to: '/employees', label: 'Employees' },
   { to: '/services', label: 'Services' },
   { to: '/gallery', label: 'Gallery' },
+  { to: '/blog', label: 'Blog' },
   { to: '/transactions', label: 'Transactions' },
   { to: '/payroll', label: 'Payroll' },
   { to: '/reports', label: 'Reports' },
