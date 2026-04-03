@@ -8,7 +8,6 @@ const emptyForm = {
   phone: '',
   email: '',
   payType: 'commission',
-  commissionRate: '45',
   hourlyRate: '',
   baseSalary: '',
   tipsEnabled: true,
@@ -16,17 +15,14 @@ const emptyForm = {
   isActive: true,
 };
 
-function rateLabel(e) {
-  if (e.payType === 'commission')
-    return `${(Number(e.commissionRate || 0) * 100).toFixed(0)}%`;
-  if (e.payType === 'hourly') return formatMoney(e.hourlyRate) + '/hr';
-  return formatMoney(e.baseSalary) + '/mo';
-}
-
-function formatMoney(n) {
-  return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(
-    Number(n || 0)
-  );
+/** Thợ/chủ split display (same convention as POS). */
+function splitTcLabel(e) {
+  const t = Number(e.commissionTechPct);
+  const o = Number(e.commissionOwnerPct);
+  if (!Number.isFinite(t) || !Number.isFinite(o)) return '—';
+  if (t <= 10 && o <= 10 && t + o === 10) return `${t}-${o}`;
+  const f = (x) => (Math.abs(x - Math.round(x)) < 1e-6 ? String(Math.round(x)) : x.toFixed(1));
+  return `${f(t / 10)}-${f(o / 10)}`;
 }
 
 export default function Employees() {
@@ -57,14 +53,12 @@ export default function Employees() {
   };
 
   const openEdit = (e) => {
-    const cr = e.commissionRate != null ? Number(e.commissionRate) : 0;
     setForm({
       firstName: e.firstName,
       lastName: e.lastName,
       phone: e.phone || '',
       email: e.email || '',
-      payType: e.payType,
-      commissionRate: String(cr <= 1 && cr > 0 ? cr * 100 : cr || ''),
+      payType: 'commission',
       hourlyRate: e.hourlyRate != null ? String(e.hourlyRate) : '',
       baseSalary: e.baseSalary != null ? String(e.baseSalary) : '',
       tipsEnabled: !!e.tipsEnabled,
@@ -74,13 +68,13 @@ export default function Employees() {
     setModal({ type: 'edit', id: e.id });
   };
 
-  const payloadFromForm = () => {
+  const payloadFromForm = (editing) => {
     const p = {
       firstName: form.firstName,
       lastName: form.lastName,
       phone: form.phone || null,
       email: form.email || null,
-      payType: form.payType,
+      payType: 'commission',
       tipsEnabled: form.tipsEnabled,
       hireDate: form.hireDate || null,
       isActive: form.isActive,
@@ -88,13 +82,14 @@ export default function Employees() {
       hourlyRate: null,
       baseSalary: null,
     };
-    if (form.payType === 'commission') {
-      let cr = Number(form.commissionRate);
-      if (cr > 1) cr /= 100;
-      p.commissionRate = cr;
+    if (editing) {
+      p.commissionTechPct = editing.commissionTechPct;
+      p.commissionOwnerPct = editing.commissionOwnerPct;
+      p.cashPortionPct = editing.cashPortionPct;
+      p.minimumPay = editing.minimumPay;
+      if (editing.nickName != null) p.nickName = editing.nickName;
+      if (editing.listOrder != null) p.listOrder = editing.listOrder;
     }
-    if (form.payType === 'hourly') p.hourlyRate = Number(form.hourlyRate) || 0;
-    if (form.payType === 'salary') p.baseSalary = Number(form.baseSalary) || 0;
     return p;
   };
 
@@ -102,7 +97,8 @@ export default function Employees() {
     e.preventDefault();
     setSaving(true);
     try {
-      const body = payloadFromForm();
+      const editing = modal?.type === 'edit' ? rows.find((r) => r.id === modal.id) : null;
+      const body = payloadFromForm(editing);
       if (modal === 'add') {
         await api.post('/api/employees', body);
       } else if (modal?.type === 'edit') {
@@ -148,8 +144,7 @@ export default function Employees() {
             <tr>
               <th className="px-4 py-3">Name</th>
               <th className="px-4 py-3">Phone</th>
-              <th className="px-4 py-3">Pay type</th>
-              <th className="px-4 py-3">Rate</th>
+              <th className="px-4 py-3">T/C (thợ–chủ)</th>
               <th className="px-4 py-3">Status</th>
               <th className="px-4 py-3 text-right">Actions</th>
             </tr>
@@ -159,8 +154,7 @@ export default function Employees() {
               <tr key={e.id} className="border-t border-rose-50">
                 <td className="px-4 py-3 font-medium">{employeeFullName(e)}</td>
                 <td className="px-4 py-3">{e.phone || '—'}</td>
-                <td className="px-4 py-3 capitalize">{e.payType}</td>
-                <td className="px-4 py-3">{rateLabel(e)}</td>
+                <td className="px-4 py-3">{splitTcLabel(e)}</td>
                 <td className="px-4 py-3">
                   <span
                     className={`rounded-full px-2 py-0.5 text-xs font-medium ${
@@ -236,56 +230,9 @@ export default function Employees() {
                   onChange={(ev) => setForm({ ...form, email: ev.target.value })}
                 />
               </div>
-              <div>
-                <label className="text-xs font-medium text-slate-600">Pay type</label>
-                <select
-                  className="mt-1 w-full rounded-lg border border-rose-200 px-3 py-2 text-sm"
-                  value={form.payType}
-                  onChange={(ev) => setForm({ ...form, payType: ev.target.value })}
-                >
-                  <option value="commission">Commission</option>
-                  <option value="hourly">Hourly</option>
-                  <option value="salary">Salary</option>
-                </select>
-              </div>
-              {form.payType === 'commission' && (
-                <div>
-                  <label className="text-xs font-medium text-slate-600">
-                    Commission % (e.g. 45 for 45%, or 0.45 for 45%)
-                  </label>
-                  <input
-                    step="0.01"
-                    min="0"
-                    className="mt-1 w-full rounded-lg border border-rose-200 px-3 py-2 text-sm"
-                    value={form.commissionRate}
-                    onChange={(ev) => setForm({ ...form, commissionRate: ev.target.value })}
-                  />
-                </div>
-              )}
-              {form.payType === 'hourly' && (
-                <div>
-                  <label className="text-xs font-medium text-slate-600">Hourly rate ($)</label>
-                  <input
-                    type="number"
-                    step="0.01"
-                    className="mt-1 w-full rounded-lg border border-rose-200 px-3 py-2 text-sm"
-                    value={form.hourlyRate}
-                    onChange={(ev) => setForm({ ...form, hourlyRate: ev.target.value })}
-                  />
-                </div>
-              )}
-              {form.payType === 'salary' && (
-                <div>
-                  <label className="text-xs font-medium text-slate-600">Base salary ($/month)</label>
-                  <input
-                    type="number"
-                    step="0.01"
-                    className="mt-1 w-full rounded-lg border border-rose-200 px-3 py-2 text-sm"
-                    value={form.baseSalary}
-                    onChange={(ev) => setForm({ ...form, baseSalary: ev.target.value })}
-                  />
-                </div>
-              )}
+              <p className="text-xs text-slate-500">
+                Chia thợ/chủ, cash/check và bao lương chỉnh trên ứng dụng POS (Employees).
+              </p>
               <label className="flex items-center gap-2 text-sm">
                 <input
                   type="checkbox"

@@ -59,7 +59,12 @@ export default function Transactions() {
   }, [all, start, end, employeeId]);
 
   const totalRevenue = useMemo(
-    () => filtered.reduce((s, t) => s + Number(t.amount || 0), 0),
+    () =>
+      filtered.reduce((s, t) => {
+        const a = Number(t.amount || 0);
+        const tip = Number(t.tips || 0);
+        return s + Math.max(0, a - tip);
+      }, 0),
     [filtered]
   );
 
@@ -88,11 +93,13 @@ export default function Transactions() {
     setSaving(true);
     try {
       const notes = `Customer: ${form.customerName || 'Walk-in'} | Tel: ${form.customerPhone || '—'}`;
+      const price = Number(selectedService?.price || 0);
+      const tipAmt = Number(form.tips) || 0;
       await api.post('/api/transactions', {
         employeeId: Number(form.employeeId),
         serviceId: Number(form.serviceId),
-        amount: Number(selectedService?.price || 0),
-        tips: Number(form.tips) || 0,
+        amount: Math.round((price + tipAmt) * 100) / 100,
+        tips: Math.round(tipAmt * 100) / 100,
         paymentMethod: form.paymentMethod,
         date: form.date.slice(0, 10),
         notes,
