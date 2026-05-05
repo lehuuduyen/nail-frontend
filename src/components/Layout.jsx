@@ -1,5 +1,7 @@
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useBookingNotifications } from '../hooks/useBookingNotifications';
+import BookingToast from './BookingToast';
 
 const nav = [
   { to: '/', label: 'Dashboard' },
@@ -14,8 +16,9 @@ const nav = [
 ];
 
 export default function Layout() {
-  const { user, logout } = useAuth();
+  const { user, logout, isAuthenticated } = useAuth();
   const navigate = useNavigate();
+  const { toasts, dismissToast } = useBookingNotifications(isAuthenticated);
 
   const handleLogout = () => {
     logout();
@@ -58,18 +61,29 @@ export default function Layout() {
               </span>
             )}
           </span>
-          <button
-            type="button"
-            onClick={handleLogout}
-            className="rounded-lg border border-rose-200 px-3 py-1.5 text-sm font-medium text-primary transition hover:bg-rose-50"
-          >
-            Log out
-          </button>
+          <div className="flex items-center gap-3">
+            {toasts.length > 0 && (
+              <div className="relative">
+                <span className="text-xl">🔔</span>
+                <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-white">
+                  {toasts.length}
+                </span>
+              </div>
+            )}
+            <button
+              type="button"
+              onClick={handleLogout}
+              className="rounded-lg border border-rose-200 px-3 py-1.5 text-sm font-medium text-primary transition hover:bg-rose-50"
+            >
+              Log out
+            </button>
+          </div>
         </header>
         <main className="flex-1 overflow-auto p-6">
           <Outlet />
         </main>
       </div>
+      <BookingToast toasts={toasts} onDismiss={dismissToast} />
     </div>
   );
 }
