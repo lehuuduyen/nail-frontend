@@ -2,6 +2,7 @@ import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useBookingNotifications } from '../hooks/useBookingNotifications';
 import BookingToast from './BookingToast';
+import NotificationConsentDialog from './NotificationConsentDialog';
 
 const nav = [
   { to: '/', label: 'Dashboard' },
@@ -84,6 +85,7 @@ export default function Layout() {
         </main>
       </div>
       <BookingToast toasts={toasts} onDismiss={dismissToast} />
+      <NotificationConsentDialog />
     </div>
   );
 }

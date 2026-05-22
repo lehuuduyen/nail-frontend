@@ -19,6 +19,8 @@ export default function Gallery() {
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(null);
   const [cat, setCat] = useState('manicure');
+  const [urlInput, setUrlInput] = useState('');
+  const [importingUrl, setImportingUrl] = useState(false);
 
   const load = useCallback(async () => {
     const { data } = await api.get('/api/gallery/admin');
@@ -76,6 +78,25 @@ export default function Gallery() {
     } finally {
       setUploadProgress(null);
       setUploading(false);
+    }
+  };
+
+  const onImportUrl = async () => {
+    const url = urlInput.trim();
+    if (!url) return;
+    setImportingUrl(true);
+    try {
+      await api.post('/api/gallery/from-url', {
+        url,
+        category: cat,
+        displayOrder: items.length,
+      });
+      setUrlInput('');
+      await load();
+    } catch (err) {
+      alert(err.response?.data?.error || err.message);
+    } finally {
+      setImportingUrl(false);
     }
   };
 
@@ -143,6 +164,35 @@ export default function Gallery() {
         <p className="mt-2 text-xs text-slate-500">
           Select multiple images at once (same category). Drag cards to reorder on the website.
         </p>
+      </div>
+
+      <div className="rounded-2xl border border-rose-100 bg-white p-6 shadow-sm">
+        <h3 className="text-sm font-semibold text-primary">Import from URL</h3>
+        <p className="mt-1 text-xs text-slate-500">
+          Paste a direct image link from Facebook or Instagram (right-click image → Copy image address).
+        </p>
+        <div className="mt-4 flex flex-wrap items-end gap-4">
+          <div className="flex-1 min-w-64">
+            <label className="text-xs font-medium text-slate-600">Image URL</label>
+            <input
+              type="url"
+              placeholder="https://scontent.*.fbcdn.net/... or https://*.cdninstagram.com/..."
+              className="mt-1 block w-full rounded-lg border border-rose-200 px-3 py-2 text-sm placeholder:text-slate-300"
+              value={urlInput}
+              onChange={(e) => setUrlInput(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && onImportUrl()}
+              disabled={importingUrl}
+            />
+          </div>
+          <button
+            type="button"
+            onClick={onImportUrl}
+            disabled={importingUrl || !urlInput.trim()}
+            className="inline-flex cursor-pointer items-center rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-white shadow hover:bg-primary-dark disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {importingUrl ? 'Downloading…' : 'Download & Save'}
+          </button>
+        </div>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">

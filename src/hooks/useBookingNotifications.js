@@ -4,13 +4,6 @@ import api from '../api/client';
 const POLL_INTERVAL = 30_000;
 const LS_KEY = 'nail_notif_last_checked';
 
-function requestBrowserPermission() {
-  if (!('Notification' in window)) return;
-  if (Notification.permission === 'default') {
-    Notification.requestPermission();
-  }
-}
-
 function fireBrowserNotification(booking) {
   if (!('Notification' in window) || Notification.permission !== 'granted') return;
   const time = new Date(booking.scheduledAt).toLocaleString('en-US', {
@@ -35,8 +28,6 @@ export function useBookingNotifications(isAuthenticated) {
 
   useEffect(() => {
     if (!isAuthenticated) return;
-
-    requestBrowserPermission();
 
     const stored = localStorage.getItem(LS_KEY);
     lastCheckedRef.current = stored ? new Date(stored) : new Date();
