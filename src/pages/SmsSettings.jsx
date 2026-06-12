@@ -82,7 +82,7 @@ function TemplateCard({ tpl, onSave }) {
 export default function SmsSettings() {
   const [templates, setTemplates] = useState([]);
   const [settings, setSettings] = useState(null);
-  const [managerPhone, setManagerPhone] = useState('');
+  const [managerPhones, setManagerPhones] = useState(['']);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
@@ -104,7 +104,8 @@ export default function SmsSettings() {
       .then(([tplRes, setRes]) => {
         setTemplates(tplRes.data.templates);
         setSettings(setRes.data);
-        setManagerPhone(setRes.data.managerPhone || '');
+        const phones = setRes.data.managerPhones || [];
+        setManagerPhones(phones.length ? phones : ['']);
       })
       .catch((e) => setError(e.response?.data?.error || e.message))
       .finally(() => setLoading(false));
@@ -118,8 +119,11 @@ export default function SmsSettings() {
   const handleSaveSettings = async () => {
     setSettingsSaving(true);
     try {
-      const { data } = await api.put('/api/sms/settings', { ...settings, managerPhone: managerPhone.trim() || null });
+      const cleanPhones = managerPhones.map((p) => p.trim()).filter(Boolean);
+      const { data } = await api.put('/api/sms/settings', { ...settings, managerPhones: cleanPhones });
       setSettings(data);
+      const phones = data.managerPhones || [];
+      setManagerPhones(phones.length ? phones : ['']);
       setSettingsSaved(true);
       setTimeout(() => setSettingsSaved(false), 2000);
     } catch (e) {
@@ -206,17 +210,46 @@ export default function SmsSettings() {
             </div>
           </div>
           <div className="mt-4 border-t border-slate-100 pt-4">
-            <label className="mb-1 block text-sm font-medium text-slate-600">
-              Manager phone — receives SMS on every new booking
-            </label>
-            <input
-              type="tel"
-              value={managerPhone}
-              onChange={(e) => setManagerPhone(e.target.value)}
-              placeholder="(602) 555-0100"
-              className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
-            />
-            <p className="mt-1 text-xs text-slate-400">Leave blank to disable manager notifications.</p>
+            <div className="mb-2 flex items-center justify-between">
+              <label className="text-sm font-medium text-slate-600">
+                Manager phones — receive SMS on every new booking
+              </label>
+              <button
+                type="button"
+                onClick={() => setManagerPhones((prev) => [...prev, ''])}
+                className="rounded-lg bg-rose-50 px-3 py-1 text-xs font-medium text-primary hover:bg-rose-100"
+              >
+                + Add number
+              </button>
+            </div>
+            <div className="space-y-2">
+              {managerPhones.map((ph, idx) => (
+                <div key={idx} className="flex items-center gap-2">
+                  <input
+                    type="tel"
+                    value={ph}
+                    onChange={(e) => {
+                      const next = [...managerPhones];
+                      next[idx] = e.target.value;
+                      setManagerPhones(next);
+                    }}
+                    placeholder="(602) 555-0100"
+                    className="flex-1 rounded-lg border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
+                  />
+                  {managerPhones.length > 1 && (
+                    <button
+                      type="button"
+                      onClick={() => setManagerPhones((prev) => prev.filter((_, i) => i !== idx))}
+                      className="rounded-lg px-2 py-2 text-slate-400 hover:bg-slate-100 hover:text-red-500"
+                      title="Remove"
+                    >
+                      ✕
+                    </button>
+                  )}
+                </div>
+              ))}
+            </div>
+            <p className="mt-1 text-xs text-slate-400">Leave all blank to disable manager notifications.</p>
           </div>
           <div className="mt-4 flex justify-end">
             <button
