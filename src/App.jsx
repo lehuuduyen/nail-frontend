@@ -13,6 +13,7 @@ const Reports     = lazy(() => import('./pages/Reports'));
 const Schedule    = lazy(() => import('./pages/Schedule'));
 const Gallery     = lazy(() => import('./pages/Gallery'));
 const Blog        = lazy(() => import('./pages/Blog'));
+const SmsSettings = lazy(() => import('./pages/SmsSettings'));
 
 function PageLoader() {
   return (
@@ -38,6 +39,7 @@ export default function App() {
             <Route path="/transactions" element={<Transactions />} />
             <Route path="/payroll" element={<Payroll />} />
             <Route path="/reports" element={<Reports />} />
+            <Route path="/sms-settings" element={<SmsSettings />} />
           </Route>
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />

@@ -14,6 +14,7 @@ const nav = [
   { to: '/transactions', label: 'Transactions' },
   { to: '/payroll', label: 'Payroll' },
   { to: '/reports', label: 'Reports' },
+  { to: '/sms-settings', label: 'SMS' },
 ];
 
 export default function Layout() {
