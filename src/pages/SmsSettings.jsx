@@ -28,10 +28,14 @@ const TEMPLATE_LABELS = {
 };
 
 const TEMPLATE_VARS = {
-  booking_confirm: ['{name}', '{time}', '{salon}', '{confirmation}'],
+  booking_confirm: ['{name}', '{time}', '{technician}', '{salon}', '{confirmation}'],
   checkin_confirm: ['{name}', '{salon}'],
   eod_thankyou: ['{name}', '{salon}'],
   birthday: ['{name}', '{salon}'],
+};
+
+const TEMPLATE_VAR_HINTS = {
+  '{technician}': '→ " with Amy" nếu khách chọn kỹ thuật viên; rỗng nếu chọn anyone',
 };
 
 function TemplateCard({ tpl, onSave }) {
@@ -71,7 +75,7 @@ function TemplateCard({ tpl, onSave }) {
             key={v}
             onClick={() => setBody((b) => b + v)}
             className="cursor-pointer rounded-full bg-rose-50 px-2 py-0.5 text-xs font-mono text-primary hover:bg-rose-100"
-            title="Click to insert"
+            title={TEMPLATE_VAR_HINTS[v] || 'Click to insert'}
           >
             {v}
           </span>
