@@ -1,6 +1,25 @@
 import { useEffect, useState, useCallback } from 'react';
 import api from '../api/client';
 
+const TIMEZONES = [
+  { label: 'US — Eastern (New York)', value: 'America/New_York' },
+  { label: 'US — Central (Chicago)', value: 'America/Chicago' },
+  { label: 'US — Mountain (Denver)', value: 'America/Denver' },
+  { label: 'US — Mountain no DST (Phoenix)', value: 'America/Phoenix' },
+  { label: 'US — Pacific (Los Angeles)', value: 'America/Los_Angeles' },
+  { label: 'US — Alaska (Anchorage)', value: 'America/Anchorage' },
+  { label: 'US — Hawaii (Honolulu)', value: 'Pacific/Honolulu' },
+  { label: 'Canada — Atlantic (Halifax)', value: 'America/Halifax' },
+  { label: 'Canada — Pacific (Vancouver)', value: 'America/Vancouver' },
+  { label: 'Europe — London', value: 'Europe/London' },
+  { label: 'Europe — Paris / Berlin', value: 'Europe/Paris' },
+  { label: 'Asia — Tokyo', value: 'Asia/Tokyo' },
+  { label: 'Asia — Ho Chi Minh City', value: 'Asia/Ho_Chi_Minh' },
+  { label: 'Asia — Bangkok', value: 'Asia/Bangkok' },
+  { label: 'Asia — Singapore', value: 'Asia/Singapore' },
+  { label: 'Australia — Sydney', value: 'Australia/Sydney' },
+];
+
 const TEMPLATE_LABELS = {
   booking_confirm: 'Booking Confirmation',
   checkin_confirm: 'Walk-in Check-in',
@@ -251,6 +270,25 @@ export default function SmsSettings() {
             </div>
             <p className="mt-1 text-xs text-slate-400">Leave all blank to disable manager notifications.</p>
           </div>
+
+          <div className="mt-4 border-t border-slate-100 pt-4">
+            <label className="mb-1 block text-sm font-medium text-slate-600">
+              Salon timezone
+            </label>
+            <select
+              value={settings.timezone || 'America/Phoenix'}
+              onChange={(e) => setSettings((s) => ({ ...s, timezone: e.target.value }))}
+              className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-primary/30"
+            >
+              {TIMEZONES.map((tz) => (
+                <option key={tz.value} value={tz.value}>{tz.label}</option>
+              ))}
+            </select>
+            <p className="mt-1 text-xs text-slate-400">
+              Dùng để hiển thị giờ đúng múi giờ trên SMS và báo cáo.
+            </p>
+          </div>
+
           <div className="mt-4 flex justify-end">
             <button
               onClick={handleSaveSettings}
