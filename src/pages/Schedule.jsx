@@ -9,7 +9,12 @@ const DAY_END_HOUR = 20;
 function formatTime(iso) {
   if (!iso) return '—';
   const d = new Date(iso);
-  return d.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
+  // scheduledAt is stored as naive UTC: UTC digits = intended local salon time
+  const hh = d.getUTCHours();
+  const mm = d.getUTCMinutes();
+  const ampm = hh >= 12 ? 'PM' : 'AM';
+  const h12 = hh % 12 || 12;
+  return `${h12}:${String(mm).padStart(2, '0')} ${ampm}`;
 }
 
 function statusStyle(status) {
@@ -89,7 +94,8 @@ export default function Schedule() {
     rows.forEach((a) => {
       const d = new Date(a.scheduledAt);
       if (Number.isNaN(d.getTime())) return;
-      let h = d.getHours();
+      // Use UTC hours — naive UTC storage means UTC digits = salon local time
+      let h = d.getUTCHours();
       if (h < DAY_START_HOUR) h = DAY_START_HOUR;
       if (h > DAY_END_HOUR) h = DAY_END_HOUR;
       map[h].push(a);
@@ -108,7 +114,7 @@ export default function Schedule() {
         <div>
           <h2 className="text-2xl font-bold text-slate-900">Schedule</h2>
           <p className="text-sm text-slate-500">
-            Bookings by hour (phone AI and admin). Times use your browser timezone.
+            Bookings by hour (phone AI and admin). Times shown in salon local time.
           </p>
         </div>
         <div className="flex items-center gap-3">
@@ -152,10 +158,9 @@ export default function Schedule() {
           </div>
           <div className="divide-y divide-rose-100">
             {hours.map((hour) => {
-              const label = new Date(2000, 0, 1, hour, 0).toLocaleTimeString(undefined, {
-                hour: 'numeric',
-                minute: '2-digit',
-              });
+              const ampm = hour >= 12 ? 'PM' : 'AM';
+              const h12 = hour % 12 || 12;
+              const label = `${h12}:00 ${ampm}`;
               const list = byHour[hour] || [];
               return (
                 <div key={hour} className="grid gap-0 md:grid-cols-[120px_1fr]">
