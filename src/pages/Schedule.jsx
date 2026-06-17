@@ -234,6 +234,11 @@ export default function Schedule() {
                                 <span className="font-medium text-primary">
                                   {employeeFullName(a.Employee)}
                                 </span>
+                                {a.wantAny && (
+                                  <span className="ml-1.5 rounded-full bg-slate-100 px-1.5 py-0.5 text-[10px] font-medium text-slate-500">
+                                    auto-assigned
+                                  </span>
+                                )}
                               </>
                             )}
                           </p>
