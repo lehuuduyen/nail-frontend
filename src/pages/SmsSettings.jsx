@@ -25,6 +25,7 @@ const TEMPLATE_LABELS = {
   checkin_confirm: 'Walk-in Check-in',
   eod_thankyou: 'End-of-Day Thank You',
   birthday: 'Birthday Greeting',
+  manager_booking_alert: 'Manager Booking Alert',
 };
 
 const TEMPLATE_VARS = {
@@ -32,11 +33,14 @@ const TEMPLATE_VARS = {
   checkin_confirm: ['{name}', '{salon}'],
   eod_thankyou: ['{name}', '{salon}'],
   birthday: ['{name}', '{salon}'],
+  manager_booking_alert: ['{name}', '{phone}', '{service}', '{technician}', '{time}', '{confirmation}', '{notes}'],
 };
 
 const TEMPLATE_VAR_HINTS = {
   '{technician}': '→ " with Amy" nếu khách chọn kỹ thuật viên; rỗng nếu chọn anyone',
   '{notes}': '→ "\\nSpecial requests: ..." nếu khách có ghi chú; rỗng nếu không có',
+  '{phone}': '→ số điện thoại của khách',
+  '{service}': '→ tên dịch vụ khách đặt',
 };
 
 function TemplateCard({ tpl, onSave }) {
