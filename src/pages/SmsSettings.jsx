@@ -28,7 +28,7 @@ const TEMPLATE_LABELS = {
 };
 
 const TEMPLATE_VARS = {
-  booking_confirm: ['{name}', '{time}', '{technician}', '{salon}', '{confirmation}'],
+  booking_confirm: ['{name}', '{time}', '{technician}', '{salon}', '{confirmation}', '{notes}'],
   checkin_confirm: ['{name}', '{salon}'],
   eod_thankyou: ['{name}', '{salon}'],
   birthday: ['{name}', '{salon}'],
@@ -36,6 +36,7 @@ const TEMPLATE_VARS = {
 
 const TEMPLATE_VAR_HINTS = {
   '{technician}': '→ " with Amy" nếu khách chọn kỹ thuật viên; rỗng nếu chọn anyone',
+  '{notes}': '→ "\\nSpecial requests: ..." nếu khách có ghi chú; rỗng nếu không có',
 };
 
 function TemplateCard({ tpl, onSave }) {
