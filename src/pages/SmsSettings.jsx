@@ -178,6 +178,9 @@ export default function SmsSettings() {
   if (loading) return <div className="p-6 text-sm text-slate-500">Loading…</div>;
   if (error) return <div className="p-6 text-sm text-red-500">{error}</div>;
 
+  const managerTemplate = templates.find((t) => t.type === 'manager_booking_alert');
+  const customerTemplates = templates.filter((t) => t.type !== 'manager_booking_alert');
+
   return (
     <div className="mx-auto max-w-2xl space-y-8 p-6">
       <div>
@@ -280,6 +283,15 @@ export default function SmsSettings() {
             <p className="mt-1 text-xs text-slate-400">Leave all blank to disable manager notifications.</p>
           </div>
 
+          {managerTemplate && (
+            <div className="mt-4 border-t border-slate-100 pt-4">
+              <label className="mb-2 block text-sm font-medium text-slate-600">
+                Manager alert message — nội dung SMS gửi cho quản lý mỗi khi có booking
+              </label>
+              <TemplateCard tpl={managerTemplate} onSave={handleSaveTemplate} />
+            </div>
+          )}
+
           <div className="mt-4 border-t border-slate-100 pt-4">
             <label className="mb-1 block text-sm font-medium text-slate-600">
               Salon timezone
@@ -310,11 +322,11 @@ export default function SmsSettings() {
         </section>
       )}
 
-      {/* Templates */}
+      {/* Templates — khách hàng (manager alert nằm ở mục trên) */}
       <section className="space-y-4">
         <h2 className="font-semibold text-slate-800">Message Templates</h2>
         <p className="text-xs text-slate-400">Click a variable chip to insert it into the message body.</p>
-        {templates.map((tpl) => (
+        {customerTemplates.map((tpl) => (
           <TemplateCard key={tpl.type} tpl={tpl} onSave={handleSaveTemplate} />
         ))}
       </section>
