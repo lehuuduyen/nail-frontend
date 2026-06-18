@@ -13,6 +13,7 @@ const Reports     = lazy(() => import('./pages/Reports'));
 const Schedule    = lazy(() => import('./pages/Schedule'));
 const Gallery     = lazy(() => import('./pages/Gallery'));
 const Videos      = lazy(() => import('./pages/Videos'));
+const Promos      = lazy(() => import('./pages/Promos'));
 const Blog        = lazy(() => import('./pages/Blog'));
 const SmsSettings = lazy(() => import('./pages/SmsSettings'));
 
@@ -37,6 +38,7 @@ export default function App() {
             <Route path="/services" element={<Services />} />
             <Route path="/gallery" element={<Gallery />} />
             <Route path="/videos" element={<Videos />} />
+            <Route path="/promos" element={<Promos />} />
             <Route path="/blog" element={<Blog />} />
             <Route path="/transactions" element={<Transactions />} />
             <Route path="/payroll" element={<Payroll />} />
