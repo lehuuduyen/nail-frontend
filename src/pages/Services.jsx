@@ -30,6 +30,7 @@ const emptySvc = {
   name: '',
   nameVi: '',
   description: '',
+  imageUrl: '',
   price: '',
   priceCard: '',
   duration: '',
@@ -44,6 +45,7 @@ export default function Services() {
   const [modal, setModal] = useState(null);
   const [form, setForm] = useState(emptySvc);
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
 
   const load = async () => {
     const { data } = await api.get('/api/services');
@@ -101,6 +103,7 @@ export default function Services() {
       name: s.name,
       nameVi: s.nameVi || '',
       description: s.description || '',
+      imageUrl: s.imageUrl || '',
       price: String(s.price),
       priceCard: s.priceCard != null && s.priceCard !== '' ? String(s.priceCard) : '',
       duration: String(s.duration),
@@ -119,6 +122,7 @@ export default function Services() {
         name: form.name,
         nameVi: form.nameVi?.trim() || null,
         description: form.description || null,
+        imageUrl: form.imageUrl?.trim() || null,
         price: Number(form.price),
         priceCard:
           form.priceCard === '' || form.priceCard == null
@@ -137,6 +141,22 @@ export default function Services() {
       alert(err.response?.data?.error || err.message);
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleUpload = async (file) => {
+    if (!file || !modal?.id) return;
+    setUploading(true);
+    try {
+      const fd = new FormData();
+      fd.append('image', file);
+      const { data } = await api.post(`/api/services/${modal.id}/image`, fd);
+      setForm((f) => ({ ...f, imageUrl: data.imageUrl || '' }));
+      await load();
+    } catch (err) {
+      alert(err.response?.data?.error || err.message);
+    } finally {
+      setUploading(false);
     }
   };
 
@@ -177,6 +197,13 @@ export default function Services() {
                   s.isActive ? 'border-rose-100' : 'border-slate-200 opacity-70'
                 }`}
               >
+                {s.imageUrl && (
+                  <img
+                    src={s.imageUrl}
+                    alt={s.name}
+                    className="mb-3 h-24 w-full rounded-xl object-cover"
+                  />
+                )}
                 <div className="flex items-start justify-between gap-2">
                   <div>
                     <p className="font-semibold text-slate-900">{s.name}</p>
@@ -314,6 +341,54 @@ export default function Services() {
                   value={form.description}
                   onChange={(ev) => setForm({ ...form, description: ev.target.value })}
                 />
+              </div>
+              <div>
+                <label className="text-xs font-medium text-slate-600">Service image</label>
+                {form.imageUrl && (
+                  <img
+                    src={form.imageUrl}
+                    alt="Service preview"
+                    className="mt-1 h-28 w-full rounded-lg border border-rose-100 object-cover"
+                  />
+                )}
+                <input
+                  type="url"
+                  className="mt-2 w-full rounded-lg border border-rose-200 px-3 py-2 text-sm"
+                  value={form.imageUrl}
+                  onChange={(ev) => setForm({ ...form, imageUrl: ev.target.value })}
+                  placeholder="Paste image URL, or upload a file below"
+                />
+                <div className="mt-2 flex flex-wrap items-center gap-2">
+                  {modal !== 'add' ? (
+                    <label
+                      className={`cursor-pointer rounded-lg border border-rose-200 px-3 py-1.5 text-xs font-medium text-primary hover:bg-rose-50 ${
+                        uploading ? 'opacity-60' : ''
+                      }`}
+                    >
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        disabled={uploading}
+                        onChange={(ev) => handleUpload(ev.target.files?.[0])}
+                      />
+                      {uploading ? 'Uploading…' : 'Upload image file'}
+                    </label>
+                  ) : (
+                    <p className="text-xs text-slate-400">
+                      Save the service first to upload a file, or paste a URL above.
+                    </p>
+                  )}
+                  {form.imageUrl && (
+                    <button
+                      type="button"
+                      onClick={() => setForm({ ...form, imageUrl: '' })}
+                      className="text-xs font-medium text-slate-500 hover:underline"
+                    >
+                      Remove image
+                    </button>
+                  )}
+                </div>
               </div>
               <label className="flex items-center gap-2 text-sm">
                 <input

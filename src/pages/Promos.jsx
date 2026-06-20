@@ -11,7 +11,9 @@ const emptyForm = {
   ctaLabel: 'Book Now',
   ctaHref: '/booking',
   active: true,
+  showCountdown: false,
   displayOrder: 0,
+  tiers: [],
 };
 
 function fmt(d) {
@@ -60,7 +62,9 @@ export default function Promos() {
       ctaLabel: p.ctaLabel || 'Book Now',
       ctaHref: p.ctaHref || '/booking',
       active: !!p.active,
+      showCountdown: !!p.showCountdown,
       displayOrder: p.displayOrder ?? 0,
+      tiers: Array.isArray(p.tiers) ? p.tiers : [],
     });
     setModal({ id: p.id });
   };
@@ -83,6 +87,16 @@ export default function Promos() {
       setSaving(false);
     }
   };
+
+  const addTier = () =>
+    setForm((f) => ({ ...f, tiers: [...f.tiers, { worth: '', pay: '', bestValue: false }] }));
+  const updateTier = (i, key, val) =>
+    setForm((f) => ({
+      ...f,
+      tiers: f.tiers.map((t, idx) => (idx === i ? { ...t, [key]: val } : t)),
+    }));
+  const removeTier = (i) =>
+    setForm((f) => ({ ...f, tiers: f.tiers.filter((_, idx) => idx !== i) }));
 
   const toggle = async (p) => {
     try {
@@ -310,15 +324,86 @@ export default function Promos() {
                   />
                 </div>
               </div>
-              <label className="flex items-center gap-1.5 text-sm text-slate-600">
-                <input
-                  type="checkbox"
-                  checked={form.active}
-                  onChange={(e) => setForm({ ...form, active: e.target.checked })}
-                  className="accent-primary"
-                />
-                Active (master switch)
-              </label>
+              <div>
+                <div className="mb-2 flex items-center justify-between">
+                  <label className="text-sm font-medium text-slate-600">
+                    Pricing tiers (optional)
+                  </label>
+                  <button
+                    type="button"
+                    onClick={addTier}
+                    className="rounded-lg bg-rose-50 px-3 py-1 text-xs font-medium text-primary hover:bg-rose-100"
+                  >
+                    + Add tier
+                  </button>
+                </div>
+                {form.tiers.length === 0 ? (
+                  <p className="text-xs text-slate-400">
+                    For gift-card style promos: e.g. worth $50 → pay $45.
+                  </p>
+                ) : (
+                  <div className="space-y-2">
+                    {form.tiers.map((t, i) => (
+                      <div key={i} className="flex flex-wrap items-center gap-2">
+                        <span className="text-xs text-slate-500">Worth $</span>
+                        <input
+                          type="number"
+                          min="0"
+                          value={t.worth}
+                          onChange={(e) => updateTier(i, 'worth', e.target.value)}
+                          className="w-20 rounded-lg border border-slate-200 px-2 py-1 text-sm"
+                        />
+                        <span className="text-xs text-slate-500">Pay $</span>
+                        <input
+                          type="number"
+                          min="0"
+                          value={t.pay}
+                          onChange={(e) => updateTier(i, 'pay', e.target.value)}
+                          className="w-20 rounded-lg border border-slate-200 px-2 py-1 text-sm"
+                        />
+                        <label className="flex items-center gap-1 text-xs text-slate-600">
+                          <input
+                            type="checkbox"
+                            checked={!!t.bestValue}
+                            onChange={(e) => updateTier(i, 'bestValue', e.target.checked)}
+                            className="accent-primary"
+                          />
+                          Best
+                        </label>
+                        <button
+                          type="button"
+                          onClick={() => removeTier(i)}
+                          className="ml-auto rounded-lg px-2 py-1 text-slate-400 hover:bg-slate-100 hover:text-red-500"
+                          title="Remove"
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              <div className="flex flex-wrap gap-5">
+                <label className="flex items-center gap-1.5 text-sm text-slate-600">
+                  <input
+                    type="checkbox"
+                    checked={form.active}
+                    onChange={(e) => setForm({ ...form, active: e.target.checked })}
+                    className="accent-primary"
+                  />
+                  Active (master switch)
+                </label>
+                <label className="flex items-center gap-1.5 text-sm text-slate-600">
+                  <input
+                    type="checkbox"
+                    checked={form.showCountdown}
+                    onChange={(e) => setForm({ ...form, showCountdown: e.target.checked })}
+                    className="accent-primary"
+                  />
+                  Show countdown timer
+                </label>
+              </div>
             </div>
             <div className="mt-6 flex justify-end gap-3">
               <button
