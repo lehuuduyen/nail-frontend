@@ -322,6 +322,61 @@ export default function SmsSettings() {
         </section>
       )}
 
+      {/* New-customer $5 off offer */}
+      {settings && (
+        <section className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+          <div className="mb-1 flex items-center justify-between">
+            <h2 className="font-semibold text-slate-800">New Customer $5 Offer</h2>
+            <label className="flex cursor-pointer items-center gap-2 text-sm text-slate-600">
+              <input
+                type="checkbox"
+                checked={settings.newCustomerOfferEnabled !== false}
+                onChange={(e) => setSettings((s) => ({ ...s, newCustomerOfferEnabled: e.target.checked }))}
+                className="h-4 w-4 rounded accent-primary"
+              />
+              Enabled
+            </label>
+          </div>
+          <p className="mb-4 text-xs text-slate-400">
+            Khi bật: khách đặt lịch lần đầu (SĐT chưa từng có trong lịch hẹn) sẽ nhận thêm dòng này
+            trong SMS xác nhận, và promo hiện trên website (/specials + trang booking). Tắt để ẩn cả hai.
+          </p>
+
+          <div className="space-y-3">
+            {[
+              { key: 'newCustomerOfferEn', label: 'English' },
+              { key: 'newCustomerOfferEs', label: 'Español' },
+              { key: 'newCustomerOfferVi', label: 'Tiếng Việt (no accents)' },
+            ].map(({ key, label }) => (
+              <div key={key}>
+                <label className="mb-1 block text-sm font-medium text-slate-600">{label}</label>
+                <textarea
+                  value={settings[key] || ''}
+                  onChange={(e) => setSettings((s) => ({ ...s, [key]: e.target.value }))}
+                  rows={2}
+                  disabled={settings.newCustomerOfferEnabled === false}
+                  className="w-full resize-none rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-primary/30 disabled:opacity-50"
+                />
+                <span className="text-xs text-slate-400">{(settings[key] || '').length} chars</span>
+              </div>
+            ))}
+          </div>
+          <p className="mt-2 text-xs text-slate-400">
+            SMS gửi theo ngôn ngữ khách chọn lúc đặt lịch (mặc định English). Để trống một ô để dùng lại câu mặc định.
+          </p>
+
+          <div className="mt-4 flex justify-end">
+            <button
+              onClick={handleSaveSettings}
+              disabled={settingsSaving}
+              className="rounded-lg bg-primary px-4 py-1.5 text-sm font-medium text-white hover:bg-primary/90 disabled:opacity-40"
+            >
+              {settingsSaving ? 'Saving…' : settingsSaved ? 'Saved ✓' : 'Save'}
+            </button>
+          </div>
+        </section>
+      )}
+
       {/* Templates — khách hàng (manager alert nằm ở mục trên) */}
       <section className="space-y-4">
         <h2 className="font-semibold text-slate-800">Message Templates</h2>
