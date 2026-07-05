@@ -342,6 +342,23 @@ export default function SmsSettings() {
             trong SMS xác nhận, và promo hiện trên website (/specials + trang booking). Tắt để ẩn cả hai.
           </p>
 
+          <div className="mb-4 rounded-lg border border-slate-200 bg-slate-50 p-3">
+            <label className="flex cursor-pointer items-center gap-2 text-sm font-medium text-slate-700">
+              <input
+                type="checkbox"
+                checked={settings.promoCountdownEnabled === true}
+                disabled={settings.newCustomerOfferEnabled === false}
+                onChange={(e) => setSettings((s) => ({ ...s, promoCountdownEnabled: e.target.checked }))}
+                className="h-4 w-4 rounded accent-primary disabled:opacity-50"
+              />
+              ⏰ Đồng hồ đếm ngược trên website
+            </label>
+            <p className="mt-1 pl-6 text-xs text-slate-400">
+              Hiện đồng hồ &quot;ưu đãi kết thúc sau…&quot; đếm tới hết Chủ Nhật (giờ Arizona), tự lặp lại
+              mỗi tuần — tạo cảm giác gấp để khách đặt lịch ngay. Chỉ hiện khi offer đang bật.
+            </p>
+          </div>
+
           <div className="space-y-3">
             {[
               { key: 'newCustomerOfferEn', label: 'English' },
