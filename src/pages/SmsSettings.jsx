@@ -354,8 +354,8 @@ export default function SmsSettings() {
               ⏰ Đồng hồ đếm ngược trên website
             </label>
             <p className="mt-1 pl-6 text-xs text-slate-400">
-              Hiện đồng hồ &quot;ưu đãi kết thúc sau…&quot; đếm tới hết Chủ Nhật (giờ Arizona), tự lặp lại
-              mỗi tuần — tạo cảm giác gấp để khách đặt lịch ngay. Chỉ hiện khi offer đang bật.
+              Hiện đồng hồ &quot;Chỉ hôm nay — ưu đãi kết thúc sau…&quot; đếm tới hết ngày (nửa đêm giờ
+              Arizona), tự lặp lại mỗi ngày — tạo cảm giác gấp để khách đặt lịch ngay. Chỉ hiện khi offer đang bật.
             </p>
           </div>
 
