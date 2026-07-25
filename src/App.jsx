@@ -16,6 +16,7 @@ const Videos      = lazy(() => import('./pages/Videos'));
 const Promos      = lazy(() => import('./pages/Promos'));
 const Blog        = lazy(() => import('./pages/Blog'));
 const SmsSettings = lazy(() => import('./pages/SmsSettings'));
+const LoginErrorLogs = lazy(() => import('./pages/LoginErrorLogs'));
 
 function PageLoader() {
   return (
@@ -44,6 +45,7 @@ export default function App() {
             <Route path="/payroll" element={<Payroll />} />
             <Route path="/reports" element={<Reports />} />
             <Route path="/sms-settings" element={<SmsSettings />} />
+            <Route path="/login-error-logs" element={<LoginErrorLogs />} />
           </Route>
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />

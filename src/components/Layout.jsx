@@ -17,6 +17,7 @@ const nav = [
   { to: '/payroll', label: 'Payroll' },
   { to: '/reports', label: 'Reports' },
   { to: '/sms-settings', label: 'SMS' },
+  { to: '/login-error-logs', label: 'Login Errors' },
 ];
 
 export default function Layout() {
